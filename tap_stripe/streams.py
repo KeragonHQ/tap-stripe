@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import datetime
 import sys
 import typing as t
 
@@ -13,9 +14,6 @@ if sys.version_info >= (3, 9):
     import importlib.resources as importlib_resources
 else:
     import importlib_resources
-
-
-SCHEMAS_DIR = importlib_resources.files(__package__) / "schemas"
 
 
 class CustomersStream(StripeStream):
@@ -175,7 +173,9 @@ class ProductsStream(StripeStream):
             th.ArrayType(th.ObjectType(additional_properties=True)),
             required=True,
         ),
-        th.Property("metadata", th.ObjectType(additional_properties=True), required=True),
+        th.Property(
+            "metadata", th.ObjectType(additional_properties=True), required=True
+        ),
         th.Property("name", th.StringType, required=True),
         th.Property("package_dimensions", th.ObjectType(additional_properties=True)),
         th.Property("shippable", th.BooleanType),
@@ -186,3 +186,36 @@ class ProductsStream(StripeStream):
         th.Property("updated", th.IntegerType, required=True),
         th.Property("url", th.StringType),
     ).to_dict()
+
+
+class EventsStream(StripeStream):
+
+    name = "events"
+    path = "/events"
+    primary_keys: t.ClassVar[list[str]] = ["id"]
+    replication_key = None
+    schema = th.PropertiesList(
+        th.Property("id", th.StringType, required=True),
+        th.Property("object", th.StringType, required=True),
+        th.Property("type", th.StringType, required=True),
+        th.Property("created", th.IntegerType, required=True),
+        th.Property("data", th.ObjectType(additional_properties=True)),
+    ).to_dict()
+
+    def get_url_params(self, context, next_page_token):
+        params = {"limit": 100, "type": "*"}
+        start_date = self.get_starting_replication_key_value(context)
+
+        if start_date:
+            if type(start_date) == str:
+                start_date = int(
+                    datetime.timestamp(
+                        datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%SZ")
+                    )
+                )
+            params["created[gt]"] = start_date
+
+        if next_page_token:
+            params["starting_after"] = next_page_token
+
+        return params

@@ -42,6 +42,7 @@ class TapStripe(Tap):
             streams.CustomersStream(self),
             streams.SubscriptionsStream(self),
             streams.ProductsStream(self),
+            streams.EventsStream(self),
         ]
 
 
