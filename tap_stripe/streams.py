@@ -146,6 +146,20 @@ class SubscriptionsStream(StripeStream):
         th.Property("trial_start", th.IntegerType),
     ).to_dict()
 
+    def get_url_params(self, context, next_page_token):
+        params = {"limit": 100, "status": "all"}
+        start_date = self.get_starting_replication_key_value(context)
+
+        if start_date:
+            if type(start_date) == str:
+                start_date = int(datetime.timestamp(datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%SZ")))
+            params["created[gt]"] = start_date
+
+        if next_page_token:
+            params["starting_after"] = next_page_token
+
+        return params
+
 
 class ProductsStream(StripeStream):
 
