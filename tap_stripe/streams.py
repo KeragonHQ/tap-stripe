@@ -233,3 +233,96 @@ class EventsStream(StripeStream):
             params["starting_after"] = next_page_token
 
         return params
+
+class InvoicesStream(StripeStream):
+    name = "invoices"
+    path = "/invoices"
+    primary_keys: t.ClassVar[list[str]] = ["id"]
+    replication_key = None
+    schema = th.PropertiesList(
+        th.Property("id", th.StringType, required=True),
+        th.Property("object", th.StringType, required=True),
+        th.Property("auto_advance", th.BooleanType, required=True),
+        th.Property("charge", th.StringType),
+        th.Property(
+            "collection_method",
+            th.StringType,
+            required=True,
+            allowed_values=["charge_automatically", "send_invoice"],
+        ),
+        th.Property("currency", th.StringType, required=True),
+        th.Property("customer", th.StringType, required=True),
+        th.Property("description", th.StringType),
+        th.Property("hosted_invoice_url", th.StringType),
+        th.Property("metadata", th.ObjectType(additional_properties=True)),
+        th.Property("payment_intent", th.StringType),
+        th.Property("period_end", th.IntegerType, required=True),
+        th.Property("period_start", th.IntegerType, required=True),
+        th.Property(
+            "status",
+            th.StringType,
+            allowed_values=["draft", "open", "paid", "uncollectible", "void"],
+        ),
+        th.Property("subscription", th.StringType),
+        th.Property("total", th.IntegerType, required=True),
+        th.Property("account_country", th.StringType),
+        th.Property("account_name", th.StringType),
+        th.Property("account_tax_ids", th.ArrayType(th.StringType)),
+        th.Property("amount_due", th.IntegerType, required=True),
+        th.Property("amount_paid", th.IntegerType, required=True),
+        th.Property("amount_remaining", th.IntegerType, required=True),
+        th.Property("amount_shipping", th.IntegerType),
+        th.Property("application", th.StringType),
+        th.Property("application_fee_amount", th.IntegerType),
+        th.Property("attempt_count", th.IntegerType, required=True),
+        th.Property("attempted", th.BooleanType, required=True),
+        th.Property("automatically_finalizes_at", th.IntegerType),
+        th.Property("billing_reason", th.StringType),
+        th.Property("created", th.IntegerType, required=True),
+        th.Property("default_payment_method", th.StringType),
+        th.Property("default_source", th.StringType),
+        th.Property("default_tax_rates", th.ArrayType(th.ObjectType(additional_properties=True))),
+        th.Property("discount", th.ObjectType(additional_properties=True)),
+        th.Property("discounts", th.ArrayType(th.StringType)),
+        th.Property("due_date", th.IntegerType),
+        th.Property("effective_at", th.IntegerType),
+        th.Property("ending_balance", th.IntegerType),
+        th.Property("footer", th.StringType),
+        th.Property("from_invoice", th.ObjectType(additional_properties=True)),
+        th.Property("invoice_pdf", th.StringType),
+        th.Property("next_payment_attempt", th.IntegerType),
+        th.Property("number", th.StringType),
+        th.Property("on_behalf_of", th.StringType),
+        th.Property("paid", th.BooleanType, required=True),
+        th.Property("paid_out_of_band", th.BooleanType, required=True),
+        th.Property(
+            "payment_settings",
+            th.ObjectType(
+                th.Property("default_mandate", th.StringType),
+                th.Property("payment_method_options", th.ObjectType(additional_properties=True)),
+                th.Property("payment_method_types", th.ArrayType(th.StringType)),
+            ),
+            required=True
+        ),
+        th.Property(
+            "status_transitions",
+            th.ObjectType(
+                th.Property("finalized_at", th.IntegerType),
+                th.Property("marked_uncollectible_at", th.IntegerType),
+                th.Property("paid_at", th.IntegerType),
+                th.Property("voided_at", th.IntegerType),
+            )
+        ),
+        th.Property("subscription_details", th.ObjectType(additional_properties=True)),
+        th.Property("subscription_proration_date", th.IntegerType),
+        th.Property("subtotal", th.IntegerType, required=True),
+        th.Property("subtotal_excluding_tax", th.IntegerType),
+        th.Property("tax", th.IntegerType),
+        th.Property("test_clock", th.StringType),
+        th.Property("threshold_reason", th.ObjectType(additional_properties=True)),
+        th.Property("total_discount_amounts", th.ArrayType(th.ObjectType(additional_properties=True))),
+        th.Property("total_excluding_tax", th.IntegerType),
+        th.Property("total_tax_amounts", th.ArrayType(th.ObjectType(additional_properties=True))),
+        th.Property("transfer_data", th.ObjectType(additional_properties=True)),
+        th.Property("webhooks_delivered_at", th.IntegerType),
+    ).to_dict()
