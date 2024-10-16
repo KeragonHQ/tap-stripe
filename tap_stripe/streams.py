@@ -85,6 +85,12 @@ class SubscriptionsStream(StripeStream):
             required=True,
         ),
         th.Property("collection_method", th.StringType, required=True),
+        th.Property(
+            "pause_collection", 
+            th.ObjectType(
+                th.Property("behavior", th.StringType),
+                th.Property("resumes_at", th.IntegerType),
+        )),
         th.Property("customer", th.StringType, required=True),
         th.Property("default_payment_method", th.StringType),
         th.Property("current_period_end", th.IntegerType, required=True),
